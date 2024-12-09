@@ -1,0 +1,102 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  text-align: center;
+  margin: 20px;
+}
+
+h1 {
+  color: #333;
+}
+
+#login {
+  max-width: 300px;
+  margin: 50px auto;
+}
+
+#login input {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+}
+
+#login button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#login button:hover {
+  background-color: #0056b3;
+}
+
+#mainContent {
+  padding: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+canvas {
+  width: 100% !important;
+  height: auto !important;
+}
+
+#charts {
+  margin-top: 20px;
+}
+
+#historyPage {
+  padding: 20px;
+}
+#tempHumidityChartContainer, #solarChartContainer {
+  margin: 20px 0;
+  padding: 10px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+}
+
+#tempHumidityChart, #solarChart {
+  width: 100% !important;
+  height: 300px !important; /* 固定高度 */
+}
+
+#tempHumidityChartContainer h3, #solarChartContainer h3 {
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 10px;
+}

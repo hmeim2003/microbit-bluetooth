@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>永續智能小屋</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- 引入 Chart.js -->
+</head>
+<body>
+  <div class="container">
+    <h1>永續智能小屋</h1>
+
+    <!-- 使用者登入 -->
+    <div id="login">
+      <h2>使用者登入</h2>
+      <input type="text" id="username" placeholder="帳號">
+      <input type="password" id="password" placeholder="密碼">
+      <button onclick="login()">登入</button>
+    </div>
+
+    <!-- 主內容區域 -->
+    <div id="mainContent" style="display: none;">
+      <div class="grid">
+        <!-- 各項功能的卡片 -->
+        <div class="card">
+          <h2>溫濕度數據</h2>
+          <h3 id="temp">即時溫度: -- °C</h3>
+          <h3 id="hum">即時濕度: -- %</h3>
+        </div>
+
+        <div class="card">
+          <h2>LED 燈光控制</h2>
+          <button onclick="sendCommand('a')">開燈</button>
+          <button onclick="sendCommand('b')">關燈</button>
+        </div>
+
+        <div class="card">
+          <h2>臉部辨識資料庫</h2>
+          <input type="file" id="faceInput" accept="image/*">
+          <button onclick="uploadFaceData()">上傳臉部資料</button>
+          <button onclick="viewHistory()">查看歷史紀錄</button>
+        </div>
+
+        <div class="card">
+          <h2>窗戶控制</h2>
+          <button onclick="sendCommand('e')">關窗</button>
+          <button onclick="sendCommand('f')">開窗</button>
+        </div>
+
+        <div class="card">
+          <h2>電風扇控制</h2>
+          <button onclick="sendCommand('g')">開啟電風扇</button>
+          <button onclick="sendCommand('h')">關閉電風扇</button>
+        </div>
+
+        <div class="card">
+          <h2>RGB 燈光控制</h2>
+          <button onclick="setRGB('red')">紅色</button>
+          <button onclick="setRGB('green')">綠色</button>
+          <button onclick="setRGB('blue')">藍色</button>
+        </div>
+      </div>
+
+      <!-- 分析圖區域 -->
+      <div id="charts" class="grid">
+        <div class="card">
+          <h2>溫濕度分析圖</h2>
+          <canvas id="tempHumidityChart"></canvas>
+        </div>
+
+        <div class="card">
+          <h2>太陽能儲電供電分析圖</h2>
+          <canvas id="solarChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 歷史紀錄頁面 -->
+  <div id="historyPage" style="display: none;">
+    <h2>臉部辨識歷史紀錄</h2>
+    <ul id="faceHistoryList"></ul>
+    <button onclick="goBackToMain()">返回主頁</button>
+  </div>
+
+  <script>
+    let device;
+    let characteristic;
+
+    async function connectMicrobit() {
+      try {
+        device = await navigator.bluetooth.requestDevice({
+          filters: [{ services: ['battery_service'] }]
+        });
+
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService('battery_service');
+        characteristic = await service.getCharacteristic('battery_level');
+
+        console.log("Connected to Micro:bit");
+
+        // Listen for data from the Micro:bit (optional)
+        characteristic.addEventListener('characteristicvaluechanged', handleData);
+        await characteristic.startNotifications();
+      } catch (error) {
+        console.error('Connection failed', error);
+      }
+    }
+
+    async function sendCommand(command) {
+      if (!characteristic) {
+        console.log("Not connected to Micro:bit");
+        return;
+      }
+
+      const encoder = new TextEncoder();
+      const data = encoder.encode(command);
+      await characteristic.writeValue(data);
+      console.log(`Sent command: ${command}`);
+    }
+
+    function handleData(event) {
+      const value = event.target.value;
+      console.log("Received data:", new TextDecoder().decode(value));
+    }
+
+    // 顯示登入區域
+    function login() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      
+      if (username && password) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("mainContent").style.display = "block";
+        connectMicrobit();  // 連接 Micro:bit
+      } else {
+        alert("請輸入帳號和密碼！");
+      }
+    }
+
+    // 顯示歷史紀錄頁面
+    function viewHistory() {
+      document.getElementById("mainContent").style.display = "none";
+      document.getElementById("historyPage").style.display = "block";
+    }
+
+    // 返回主頁
+    function goBackToMain() {
+      document.getElementById("historyPage").style.display = "none";
+      document.getElementById("mainContent").style.display = "block";
+    }
+
+    // 控制RGB燈光顏色
+    function setRGB(color) {
+      console.log(`Setting RGB color to ${color}`);
+      // 實際控制 RGB 燈光的指令可以發送給 Micro:bit
+      sendCommand(color);  // 這裡可以傳遞如 'red', 'green', 'blue' 等命令
+    }
+
+    // 在這裡你可以加入其他控制功能，如電風扇、窗戶等
+  </script>
+</body>
+</html>
